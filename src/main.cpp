@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "utils.h"
+#include "glog.h"
 
 #define WINDOW_WIDTH 400
 #define WINDOW_HEIGHT 300
@@ -20,12 +21,12 @@ void processInput(GLFWwindow *window){
 }
 
 int main() {
-    printf("hello opengl!\n");
+    ilog("hello opengl");    
     if(!glfwInit()){
-        fprintf(stderr, "initialize glfw env error!\n");
+        elog("initialize glfw env error!");
         exit(-1);
     }    
-
+    
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -33,13 +34,13 @@ int main() {
     //创建glfw的窗口
     GLFWwindow *pwin = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
     if(nullptr == pwin){
-        fprintf(stderr, "can not create window!\n");
+        elog("can not create window!");
         exit(-1);
     }
 
     glfwMakeContextCurrent(pwin);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        fprintf(stderr, "Failed to initialize GLAD");
+        elog("Failed to initialize GLAD");
         return -1;
     }
 
