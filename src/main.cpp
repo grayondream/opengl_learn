@@ -131,6 +131,22 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
+
+		//update the color of point with clock flow
+		float currentTime = glfwGetTime();
+		float greenValue = sin(currentTime) / 2.0f + 0.5f;
+		float redValue = cos(currentTime) / 2.0f + 0.5f;
+		float blueValue = 0.0f;
+
+		int vertexColorLocation = glGetUniformLocation(shaderProgram, "vertexColor");
+		if (vertexColorLocation) {
+			elog("the vertexColor is no exist, please check your glsl code");
+			exit(1);
+		}
+
+		glUniform4f(vertexColorLocation, redValue, greenValue, blueValue, 1.0f);
+
+
         glBindVertexArray(vao); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
