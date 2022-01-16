@@ -5,9 +5,10 @@
 #include "utils.h"
 #include "glog.h"
 #include "shader.h"
+#include "stb_image.h"
 
-#define WINDOW_WIDTH 400
-#define WINDOW_HEIGHT 300
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
 #define WINDOW_TITLE "grayondream window"
 
 //作为windows resize操作时的callback
@@ -54,20 +55,62 @@ int main() {
 		exit(1);
 	}
 
+	//create texture
+	unsigned int textureId[2] = { 0 };
+	glGenTextures(2, textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId[0]);
+
+	//set some text parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int imageWidth = -1, imageHeight = -1, imageChannel = -1;
+	const char *imageFile = "../resources/2.jpg";
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char *imageData = stbi_load(imageFile, &imageWidth, &imageHeight, &imageChannel, 0);
+	if (!imageData) {
+		elog("can not read data from image %s", imageFile);
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(imageData);
+	imageData = nullptr;
+
+	glBindTexture(GL_TEXTURE_2D, textureId[1]);
+
+	//set some text parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	const char *pngFile = "../resources/awesomeface.png";
+	imageData = stbi_load(pngFile, &imageWidth, &imageHeight, &imageChannel, 0);
+	if (!imageData) {
+		elog("can not read data from image %s", pngFile);
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(imageData);
+
     //三角形的顶点数据
-    float vertices[] = {
-    0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // 右上角
-    0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 右下角
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,// 左下角
-    -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // 左上角
-    };
+	float vertices[] = {
+		// positions          // colors           // texture coords
+		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
+	};
 
     unsigned int indices[] = { // 注意索引从0开始! 
         0, 1, 3, // 第一个三角形
         1, 2, 3  // 第二个三角形
     };
 
-    
     //创建相关的着色器，以及着色器程序
     GLuint vbo = -1, vao = -1, ebo = -1;
     glGenBuffers(1, &vbo);
@@ -82,13 +125,16 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //设置顶点属性指针
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);   
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+	shader.use(); // 不要忘记在设置uniform变量之前激活着色器程序！
+	glUniform1i(glGetUniformLocation(shader.getID(), "texture1"), 0); // 手动设置
+	shader.setInt("texture2", 1); // 或者使用着色器类设置
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -99,6 +145,12 @@ int main() {
         //渲染指令
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureId[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textureId[1]);
+
 		shader.use();
 
         glBindVertexArray(vao); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
@@ -108,6 +160,10 @@ int main() {
         glfwSwapBuffers(pwin);
         glfwPollEvents();    
     }
+
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &ebo);
 
     glfwTerminate();
     return 0;
