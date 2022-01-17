@@ -28,7 +28,7 @@ void processInput(GLFWwindow *window){
 int main() {
     ilog("hello opengl");    
     if(!glfwInit()){
-        elog("initialize glfw env error!");
+        elog("initialize glfw env error %d!");
         exit(-1);
     }    
     
@@ -70,7 +70,7 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int imageWidth = -1, imageHeight = -1, imageChannel = -1;
-	const char *imageFile = "../resources/2.jpg";
+	const char *imageFile = "../resources/panda.jpg";
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *imageData = stbi_load(imageFile, &imageWidth, &imageHeight, &imageChannel, 0);
 	if (!imageData) {
@@ -102,11 +102,47 @@ int main() {
 
     //三角形的顶点数据
 	float vertices[] = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-		 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-		-0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
     unsigned int indices[] = { // 注意索引从0开始! 
@@ -141,12 +177,27 @@ int main() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     //创建gl的view
+	glEnable(GL_DEPTH_TEST);
+
+	glm::vec3 cubePositions[] = {
+	  glm::vec3(0.0f,  0.0f,  0.0f),
+	  glm::vec3(2.0f,  5.0f, -15.0f),
+	  glm::vec3(-1.5f, -2.2f, -2.5f),
+	  glm::vec3(-3.8f, -2.0f, -12.3f),
+	  glm::vec3(2.4f, -0.4f, -3.5f),
+	  glm::vec3(-1.7f,  3.0f, -7.5f),
+	  glm::vec3(1.3f, -2.0f, -2.5f),
+	  glm::vec3(1.5f,  2.0f, -2.5f),
+	  glm::vec3(1.5f,  0.2f, -1.5f),
+	  glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
     while(!glfwWindowShouldClose(pwin)){
         processInput(pwin);
 
         //渲染指令
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textureId[0]);
@@ -155,8 +206,7 @@ int main() {
 
 		shader.use();
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(-60.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
@@ -164,13 +214,19 @@ int main() {
 		glm::mat4 projection = glm::mat4(1.0f);
 		projection = glm::perspective(45.0f, 1.0f * WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
 
-		glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		shader.setMat4("view", view);
+		shader.setMat4("projection", projection);
 
         glBindVertexArray(vao); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		for (unsigned int i = 0; i < 10; i++){
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i + 20;
+			model = glm::rotate(model, glm::radians(angle) * (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
+			shader.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
         glfwSwapBuffers(pwin);
         glfwPollEvents();    
