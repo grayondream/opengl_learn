@@ -155,13 +155,18 @@ int main() {
 
 		shader.use();
 
-		glm::mat4 transform = glm::mat4(1.0);
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(-60.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 view = glm::mat4(1.0f);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-		unsigned int transfrormLoc = glGetUniformLocation(shader.getID(), "transform");
-		glUniformMatrix4fv(transfrormLoc, 1, GL_FALSE, glm::value_ptr(transform));
+		glm::mat4 projection = glm::mat4(1.0f);
+		projection = glm::perspective(45.0f, 1.0f * WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
+
+		glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         glBindVertexArray(vao); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 3);
