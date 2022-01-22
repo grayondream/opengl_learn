@@ -21,7 +21,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 }
 
 // camera
-Camera camera(glm::vec3(-5.0f, 2.0f, 10.0f));
+Camera camera(glm::vec3(0.0f, 0.5f, 1.0f));
 float lastX = WINDOW_WIDTH / 2.0f;
 float lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -201,7 +201,7 @@ int main() {
 
 	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 	glm::vec3 toyColor(1.0f, 0.5f, 0.31f);
-	glm::vec3 lightPos(-10.0f, 5.0f, -3.0f);
+	glm::vec3 lightPos(-0.0f, 2.0f, -10.0f);
     while(!glfwWindowShouldClose(pwin)){
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
@@ -225,11 +225,12 @@ int main() {
         glBindVertexArray(vao); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(10.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+		model = glm::rotate(model, glm::radians(5.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 		objShader.setMat4("model", model);
 		objShader.setVec3("lightPos", lightPos);
 		objShader.setVec3("objectColor", toyColor.r, toyColor.g, toyColor.b);
 		objShader.setVec3("lightColor", lightColor.r, lightColor.g, lightColor.b);
+		objShader.setVec3("viewPos", camera.Position);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		lightShader.use();
@@ -249,6 +250,7 @@ int main() {
     }
 
 	glDeleteVertexArrays(1, &vao);
+	glDeleteVertexArrays(1, &lightVao);
 	glDeleteBuffers(1, &vbo);
 	glDeleteBuffers(1, &ebo);
 
