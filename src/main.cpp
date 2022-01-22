@@ -214,6 +214,11 @@ int main() {
 		glm::mat4 projection = glm::mat4(1.0f);
 		projection = glm::perspective(45.0f, 1.0f * WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
 
+		float radius = 30.0f;
+		float camX = static_cast<float>(sin(glfwGetTime()) * radius);
+		float camZ = static_cast<float>(cos(glfwGetTime()) * radius);
+		view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 
