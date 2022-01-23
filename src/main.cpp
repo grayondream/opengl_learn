@@ -231,6 +231,11 @@ int main() {
 		objShader.setVec3("objectColor", toyColor.r, toyColor.g, toyColor.b);
 		objShader.setVec3("lightColor", lightColor.r, lightColor.g, lightColor.b);
 		objShader.setVec3("viewPos", camera.Position);
+
+		objShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+		objShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+		objShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+		objShader.setFloat("material.shininess", 32.0f);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		lightShader.use();
